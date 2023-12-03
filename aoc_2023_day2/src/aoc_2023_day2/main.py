@@ -12,6 +12,25 @@ CUBE_COUNT_SPLIT = ", "
 PART1_CUBE_COUNTS = {"red": 12, "green": 13, "blue": 14}
 
 
+def count_cubes(results_part):
+    cubes_seen = [
+        cube_val.split(" ")
+        for result in results_part.split(RESULTS_SPLIT)
+        for cube_val in result.split(CUBE_COUNT_SPLIT)
+    ]
+
+    cube_count = reduce(
+        lambda a, counts: {
+            k: max(a.get(k, 0), int(counts[0])) if k == counts[1] else a.get(k, 0)
+            for k in set([counts[1]]).union(a.keys())
+        },
+        cubes_seen,
+        {},
+    )
+
+    return cube_count
+
+
 def part1_solve(file_handle):
     out = 0
 
@@ -19,20 +38,7 @@ def part1_solve(file_handle):
         (game_id_part, results_part) = line.strip().split(GAME_ID_SPLIT)
         game_id = int(game_id_part.split(" ")[-1])
 
-        cubes_seen = [
-            cube_val.split(" ")
-            for result in results_part.split(RESULTS_SPLIT)
-            for cube_val in result.split(CUBE_COUNT_SPLIT)
-        ]
-
-        cube_count = reduce(
-            lambda a, counts: {
-                k: max(a.get(k, 0), int(counts[0])) if k == counts[1] else a.get(k, 0)
-                for k in set([counts[1]]).union(a.keys())
-            },
-            cubes_seen,
-            {},
-        )
+        cube_count = count_cubes(results_part)
 
         out += (
             game_id
@@ -55,20 +61,7 @@ def part2_solve(file_handle):
     for line in file_handle:
         (_, results_part) = line.strip().split(GAME_ID_SPLIT)
 
-        cubes_seen = [
-            cube_val.split(" ")
-            for result in results_part.split(RESULTS_SPLIT)
-            for cube_val in result.split(CUBE_COUNT_SPLIT)
-        ]
-
-        cube_count = reduce(
-            lambda a, counts: {
-                k: max(a.get(k, 0), int(counts[0])) if k == counts[1] else a.get(k, 0)
-                for k in set([counts[1]]).union(a.keys())
-            },
-            cubes_seen,
-            {},
-        )
+        cube_count = count_cubes(results_part)
 
         out += reduce(lambda a, b: b * a, cube_count.values())
 
